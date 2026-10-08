@@ -78,6 +78,16 @@ tbody tr:hover{background:var(--card2)}
   display:flex;gap:9px;align-items:center;flex-wrap:wrap;font-size:13.5px}
 .grupo .rolagem{border:0;border-radius:0}
 .vazio{padding:28px;text-align:center;color:var(--dim2);font-size:13.5px}
+.linha-hist>td{background:var(--card2);padding:12px}
+.hist-bloco{margin-bottom:14px}
+.hist-bloco:last-child{margin-bottom:0}
+.hist-tit{font-family:Sora;font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--dim)}
+.hist-tab{font-size:12px;background:var(--card)}
+.hist-tab td,.hist-tab th{white-space:nowrap;text-align:right}
+.hist-tab td:first-child,.hist-tab th:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:2}
+.hist-tab thead th:first-child{background:var(--card2)}
+.hist-tab .alvo{background:var(--amar-bg)}
+.hist-tag{font-size:9.5px;font-weight:700;color:var(--amar);text-transform:uppercase;letter-spacing:.04em}
 .aviso{background:var(--amar-bg);color:var(--amar);border:1px solid var(--amar);border-radius:10px;
   padding:10px 14px;margin-bottom:14px;font-size:13px}
 .erro{background:var(--verm-bg);color:var(--verm);border:1px solid var(--verm);border-radius:8px;
@@ -148,6 +158,7 @@ function dias(de, ate) {
   return Number.isFinite(a) && Number.isFinite(b) ? Math.round((b - a) / 86400000) : null;
 }
 const emDias = n => (n === 0 ? 'hoje' : n === 1 ? 'ontem' : 'há ' + n + ' dias');
+const pctTxt = v => (v == null ? '' : (v > 0 ? '+' : '') + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%');
 const kpi = (l, n, cls) => `<div class="kpi ${cls || ''}"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`;
 
 // ------------------------------------------------------------------ acesso
@@ -259,6 +270,13 @@ function desenhar() {
     : visao === 'cliente' ? tabela(lista) : agrupado(lista, visao);
 
   $$('#filtros .chip').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; desenhar(); }));
+  $$('[data-hist]').forEach(b => b.addEventListener('click', () => {
+    const linha = document.querySelector('.linha-hist[data-de="' + b.dataset.hist.replace(/"/g, '\\"') + '"]');
+    if (!linha) return;
+    const aberto = !linha.classList.contains('oculto');
+    linha.classList.toggle('oculto', aberto);
+    b.textContent = aberto ? 'Histórico' : 'Fechar';
+  }));
 }
 
 function agrupado(lista, por) {
@@ -284,7 +302,7 @@ function tabela(lista) {
   const n = (v, cls, sing, plur) => (v ? `<span class="pill ${cls}">${v} ${v > 1 ? plur : sing}</span>` : '');
   return `<div class="rolagem"><table>
     <thead><tr><th>Empresa</th><th>Responsável</th><th>Última competência</th>
-      <th>Em aberto</th><th>Prazo</th><th>Variação de valor</th><th>Publicado</th></tr></thead>
+      <th>Em aberto</th><th>Prazo</th><th>Variação de valor</th><th>Publicado</th><th></th></tr></thead>
     <tbody>${lista.map(e => {
       const venc = e.proximo_vencimento ? dias(e.proximo_vencimento) : null;
       return `<tr>
@@ -308,7 +326,60 @@ function tabela(lista) {
           + ((e.variacao || []).length > 3 ? '<div class="mini">+' + ((e.variacao).length - 3) + ' outro(s)</div>' : '')
         : '<span style="color:var(--dim2)">—</span>'}</td>
       <td class="mini">${esc(e.maquina)}<br>${emDias(dias(e.publicado_em))}</td>
-    </tr>`; }).join('')}</tbody></table></div>`;
+      <td>${(e.historico || []).length
+        ? `<button class="btn" data-hist="${esc(e.cnpj)}|${esc(e.maquina)}">Histórico</button>` : ''}</td>
+    </tr>
+    ${(e.historico || []).length ? `<tr class="linha-hist oculto" data-de="${esc(e.cnpj)}|${esc(e.maquina)}">
+      <td colspan="8">${historicoMensal(e)}</td></tr>` : ''}`; }).join('')}</tbody></table></div>`;
+}
+
+/** o quadro mes a mes de cada tributo - imposto, receita, aliquota efetiva e referencia */
+function historicoMensal(e) {
+  const porTributo = new Map();
+  for (const h of e.historico || []) {
+    const k = h.tributo + (h.escopo ? ' ' + h.escopo : '');
+    if (!porTributo.has(k)) porTributo.set(k, []);
+    porTributo.get(k).push(h);
+  }
+  const alertado = new Set((e.variacao || []).map(v => v.tributo + (v.escopo ? ' ' + v.escopo : '') + '|' + v.competencia));
+  return [...porTributo.entries()].map(([trib, linhas]) => {
+    linhas.sort((a, b) => String(a.competencia).localeCompare(String(b.competencia)));
+    const comReceita = linhas.filter(l => l.receita > 0);
+    const med = v => (v.length ? v.reduce((s, x) => s + x, 0) / v.length : null);
+    const mImp = med(linhas.map(l => l.imposto));
+    const mRec = comReceita.length ? med(comReceita.map(l => l.receita)) : null;
+    const mAli = comReceita.length ? med(comReceita.map(l => l.aliquotaEfetiva)) : null;
+    const alvo = l => (alertado.has(trib + '|' + l.competencia) ? ' class="alvo"' : '');
+    const cel = (l, html) => `<td${alvo(l)}>${html}</td>`;
+    return `<div class="hist-bloco">
+      <div class="hist-tit">${esc(trib)} — ${linhas.length} competência(s)</div>
+      <div class="rolagem"><table class="hist-tab">
+        <thead><tr><th>Indicador</th>${linhas.map(l =>
+          `<th${alvo(l)} style="text-align:right">${fmtMes(l.competencia)}`
+          + (alertado.has(trib + '|' + l.competencia) ? '<div class="hist-tag">alerta</div>' : '') + '</th>').join('')}
+          <th style="text-align:right">Média</th></tr></thead>
+        <tbody>
+          <tr><td><b>Imposto</b><div class="mini">variação mensal</div></td>
+            ${linhas.map((l, i) => cel(l, 'R$ ' + brl(l.imposto)
+              + (i > 0 && linhas[i - 1].imposto > 0
+                ? `<div class="mini">${pctTxt((l.imposto - linhas[i - 1].imposto) / linhas[i - 1].imposto * 100)}</div>` : ''))).join('')}
+            <td>R$ ${brl(mImp)}</td></tr>
+          ${comReceita.length ? `<tr><td><b>Receita bruta</b></td>
+            ${linhas.map(l => cel(l, l.receita > 0 ? 'R$ ' + brl(l.receita) : '—')).join('')}
+            <td>${mRec != null ? 'R$ ' + brl(mRec) : '—'}</td></tr>
+          <tr><td><b>Alíquota efetiva</b></td>
+            ${linhas.map(l => cel(l, l.aliquotaEfetiva != null
+              ? pctTxt(l.aliquotaEfetiva).replace('+', '') + `<div class="mini">${brl(l.imposto)} ÷ ${brl(l.receita)}</div>` : '—')).join('')}
+            <td>${mAli != null ? pctTxt(mAli).replace('+', '') : '—'}</td></tr>` : ''}
+          <tr><td><b>Referência (mediana)</b></td>
+            ${linhas.map(l => cel(l, l.referencia != null ? 'R$ ' + brl(l.referencia)
+              + (l.variacaoPct != null ? `<div class="mini">${pctTxt(l.variacaoPct)}</div>` : '') : '—')).join('')}
+            <td></td></tr>
+          ${linhas.some(l => l.vencimento) ? `<tr><td><b>Vencimento da guia</b></td>
+            ${linhas.map(l => cel(l, l.vencimento ? fmtData(l.vencimento) : '—')).join('')}
+            <td></td></tr>` : ''}
+        </tbody></table></div></div>`;
+  }).join('');
 }
 
 // ------------------------------------------------------------------ eventos
