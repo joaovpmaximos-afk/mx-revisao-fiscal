@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão Fiscal — MAXIMOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#0091ff; --azul2:#40a9ff; --azul-fraco:#e6f4ff;
+  --txt:#0f172a; --dim:#475569; --dim2:#94a3b8;
+  --line:#e2e8f0; --bg:#f1f5f9; --card:#fff; --card2:#f8fafc;
+  --verm:#dc2626; --verm-bg:#fef2f2; --amar:#b45309; --amar-bg:#fffbeb;
+  --verde:#059669; --verde-bg:#ecfdf5;
+}
+@media (prefers-color-scheme: dark){:root:not([data-tema="claro"]){
+  --txt:#e2e8f0; --dim:#94a3b8; --dim2:#64748b;
+  --line:#1e293b; --bg:#0b1220; --card:#0f172a; --card2:#111c30;
+  --verm:#f87171; --verm-bg:#2a1416; --amar:#fbbf24; --amar-bg:#2a2010;
+  --verde:#34d399; --verde-bg:#0c2a20; --azul-fraco:#10243a;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--txt);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
+.topo{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topo-in{max-width:1500px;margin:0 auto;padding:13px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{font-family:Sora;font-weight:700;font-size:16px}
+.logo span{color:var(--azul)}
+.topo .quem{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--dim)}
+.wrap{max-width:1500px;margin:0 auto;padding:18px 20px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 14px;
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)}
+.btn:hover{border-color:var(--azul2)}
+.btn.pri{background:var(--azul);border-color:var(--azul);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+input{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 12px;
+  font:inherit;font-size:14px;color:var(--txt);width:100%}
+input:focus{outline:none;border-color:var(--azul)}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--dim);margin:10px 0 4px}
+
+/* login */
+#login{max-width:380px;margin:9vh auto}
+#login h2{font-size:19px;margin-bottom:4px}
+#login .sub{font-size:13px;color:var(--dim);margin-bottom:12px}
+
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .n{font-family:Sora;font-size:24px;font-weight:700;line-height:1.1}
+.kpi .l{font-size:11.5px;color:var(--dim);margin-top:3px}
+.kpi.verm .n{color:var(--verm)} .kpi.amar .n{color:var(--amar)} .kpi.verde .n{color:var(--verde)}
+
+.tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;border:1px solid transparent}
+.tab.on{background:var(--azul);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:5px 11px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;cursor:pointer;color:var(--dim);background:var(--card)}
+.chip.on{background:var(--azul-fraco);border-color:var(--azul2);color:var(--azul);font-weight:600}
+
+.rolagem{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim2);background:var(--card2);font-weight:700;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--card2)}
+.pill{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600;margin:0 3px 3px 0;white-space:nowrap}
+.pill.verm{background:var(--verm-bg);color:var(--verm)}
+.pill.amar{background:var(--amar-bg);color:var(--amar)}
+.pill.verde{background:var(--verde-bg);color:var(--verde)}
+.pill.cinza{background:var(--card2);color:var(--dim)}
+.mini{font-size:11.5px;color:var(--dim2);margin-top:2px}
+.grupo{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.grupo-cab{padding:9px 13px;background:var(--card2);border-bottom:1px solid var(--line);
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;font-size:13.5px}
+.grupo .rolagem{border:0;border-radius:0}
+.vazio{padding:28px;text-align:center;color:var(--dim2);font-size:13.5px}
+.aviso{background:var(--amar-bg);color:var(--amar);border:1px solid var(--amar);border-radius:10px;
+  padding:10px 14px;margin-bottom:14px;font-size:13px}
+.erro{background:var(--verm-bg);color:var(--verm);border:1px solid var(--verm);border-radius:8px;
+  padding:9px 12px;margin-top:10px;font-size:13px}
+.oculto{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="topo"><div class="topo-in">
+  <div class="logo">Revisão <span>Fiscal</span></div>
+  <div class="quem oculto" id="barraQuem">
+    <span id="quemEmail"></span>
+    <button class="btn" id="btnAtualizar">Atualizar</button>
+    <button class="btn" id="btnSair">Sair</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+  <div class="card" id="login">
+    <h2>Entrar</h2>
+    <div class="sub">Use a mesma conta do portal MAXIMOS.</div>
+    <form id="formLogin">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" required>
+      <button class="btn pri" style="width:100%;margin-top:14px" id="btnEntrar">Entrar</button>
+      <div class="erro oculto" id="erroLogin"></div>
+    </form>
+  </div>
+
+  <div id="painel" class="oculto">
+    <div id="avisos"></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="tabs" id="visao">
+      <div class="tab on" data-v="cliente">Por cliente</div>
+      <div class="tab" data-v="colaborador">Por colaborador</div>
+      <div class="tab" data-v="maquina">Por máquina</div>
+    </div>
+    <div class="chips" id="filtros"></div>
+    <div id="lista"></div>
+  </div>
+
+</div>
+
+<script>
+const URL_BASE = 'https://fxbekqnbpumkpwitrsju.supabase.co';
+const CHAVE = 'sb_publishable_guki9WWcXJyVeM3N9pi1mA_ea6ypphQ';
+const GUARDA = 'rfis.sessao';
+const DIAS_SEM_PUBLICAR = 2;   // acima disso, a maquina vira aviso
+
+let SESSAO = null, DADOS = [], visao = 'cliente', filtro = 'todos';
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const brl = v => Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtMes = c => (c ? String(c).split('-').reverse().join('/') : '');
+const fmtData = d => (d ? String(d).slice(0, 10).split('-').reverse().join('/') : '');
+const fmtCnpj = c => String(c).replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+const hojeISO = () => new Date().toISOString().slice(0, 10);
+function dias(de, ate) {
+  if (!de) return null;
+  const a = Date.parse(String(de).slice(0, 10) + 'T00:00:00Z');
+  const b = Date.parse((ate || hojeISO()) + 'T00:00:00Z');
+  return Number.isFinite(a) && Number.isFinite(b) ? Math.round((b - a) / 86400000) : null;
+}
+const emDias = n => (n === 0 ? 'hoje' : n === 1 ? 'ontem' : 'há ' + n + ' dias');
+const kpi = (l, n, cls) => `<div class="kpi ${cls || ''}"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`;
+
+// ------------------------------------------------------------------ acesso
+async function api(caminho, opcoes = {}) {
+  const r = await fetch(URL_BASE + caminho, {
+    ...opcoes,
+    headers: { apikey: CHAVE, 'Content-Type': 'application/json', ...(opcoes.headers || {}) },
+  });
+  const t = await r.text();
+  let c = null;
+  try { c = t ? JSON.parse(t) : null; } catch (_) { c = t; }
+  if (!r.ok) throw new Error((c && (c.error_description || c.msg || c.message)) || ('HTTP ' + r.status));
+  return c;
+}
+
+function guardar(s) {
+  SESSAO = s;
+  try { localStorage.setItem(GUARDA, JSON.stringify({ refresh: s.refresh_token, email: (s.user || {}).email || '' })); } catch (_) {}
+}
+function esquecer() {
+  SESSAO = null;
+  try { localStorage.removeItem(GUARDA); } catch (_) {}
+}
+
+async function entrar(email, senha) {
+  guardar(await api('/auth/v1/token?grant_type=password', {
+    method: 'POST', body: JSON.stringify({ email, password: senha }),
+  }));
+}
+
+async function retomar() {
+  let g = null;
+  try { g = JSON.parse(localStorage.getItem(GUARDA) || 'null'); } catch (_) {}
+  if (!g || !g.refresh) return false;
+  try {
+    guardar(await api('/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST', body: JSON.stringify({ refresh_token: g.refresh }),
+    }));
+    return true;
+  } catch (_) { esquecer(); return false; }
+}
+
+async function carregar() {
+  DADOS = await api('/rest/v1/fiscal_carteira?select=*&order=gravissimos.desc,abertos.desc,nome.asc', {
+    headers: { Authorization: 'Bearer ' + SESSAO.access_token },
+  });
+}
+
+// ------------------------------------------------------------------ desenho
+function mostrarPainel() {
+  $('#login').classList.add('oculto');
+  $('#painel').classList.remove('oculto');
+  $('#barraQuem').classList.remove('oculto');
+  $('#quemEmail').textContent = (SESSAO.user || {}).email || '';
+}
+
+function desenhar() {
+  if (!DADOS.length) {
+    $('#avisos').innerHTML = '';
+    $('#kpis').innerHTML = '';
+    $('#filtros').innerHTML = '';
+    $('#lista').innerHTML = '<div class="card vazio">Nenhuma empresa publicada ainda.<br>'
+      + 'No MX CRÉDITOS de cada máquina, abra <b>Empresas</b> e clique em <b>Publicar carteira</b>.</div>';
+    return;
+  }
+
+  // maquina que parou de publicar: o painel nao pode fingir que esta em dia
+  const porMaquina = new Map();
+  for (const e of DADOS) {
+    const d = dias(e.publicado_em);
+    if (!porMaquina.has(e.maquina) || d < porMaquina.get(e.maquina)) porMaquina.set(e.maquina, d);
+  }
+  const paradas = [...porMaquina.entries()].filter(([, d]) => d != null && d > DIAS_SEM_PUBLICAR);
+  $('#avisos').innerHTML = paradas.length
+    ? `<div class="aviso"><b>Atenção:</b> ${paradas.length === 1 ? 'uma máquina não publica' : paradas.length + ' máquinas não publicam'} `
+      + `há mais de ${DIAS_SEM_PUBLICAR} dias — ${paradas.map(([m, d]) => `<b>${esc(m)}</b> (${emDias(d)})`).join(', ')}. `
+      + 'O que aparece abaixo dessas máquinas pode estar desatualizado.</div>'
+    : '';
+
+  const soma = c => DADOS.reduce((s, e) => s + (e[c] || 0), 0);
+  const vencidas = DADOS.filter(e => e.proximo_vencimento && e.proximo_vencimento < hojeISO()).length;
+  const semResp = DADOS.filter(e => !e.responsavel).length;
+  const aRean = DADOS.filter(e => !e.atualizada).length;
+  $('#kpis').innerHTML = kpi('Empresas', DADOS.length)
+    + kpi('Com alerta em aberto', DADOS.filter(e => e.abertos > 0).length, 'amar')
+    + (soma('gravissimos') ? kpi('Gravíssimos', soma('gravissimos'), 'verm') : '')
+    + (soma('graves') ? kpi('Graves', soma('graves'), 'amar') : '')
+    + kpi('Divergências', soma('divergencias'), soma('divergencias') ? 'verm' : 'verde')
+    + (vencidas ? kpi('Guia vencida', vencidas, 'verm') : '')
+    + (aRean ? kpi('A reanalisar', aRean, 'amar') : '')
+    + kpi('Máquinas publicando', porMaquina.size);
+
+  const chip = (v, rot, n) => `<div class="chip ${filtro === v ? 'on' : ''}" data-f="${v}">${rot}${n != null ? ' (' + n + ')' : ''}</div>`;
+  $('#filtros').innerHTML = chip('todos', 'Todas', DADOS.length)
+    + chip('alerta', 'Com alerta', DADOS.filter(e => e.abertos > 0).length)
+    + (soma('gravissimos') ? chip('grav', 'Gravíssimos') : '')
+    + (vencidas ? chip('vencida', 'Guia vencida', vencidas) : '')
+    + (aRean ? chip('rean', 'A reanalisar', aRean) : '')
+    + (semResp ? chip('semresp', 'Sem responsável', semResp) : '');
+
+  const lista = DADOS.filter(e => filtro === 'todos'
+    || (filtro === 'alerta' ? e.abertos > 0
+      : filtro === 'grav' ? e.gravissimos > 0
+        : filtro === 'vencida' ? (e.proximo_vencimento && e.proximo_vencimento < hojeISO())
+          : filtro === 'rean' ? !e.atualizada
+            : filtro === 'semresp' ? !e.responsavel : true));
+
+  $('#lista').innerHTML = !lista.length ? '<div class="card vazio">Nenhuma empresa neste filtro.</div>'
+    : visao === 'cliente' ? tabela(lista) : agrupado(lista, visao);
+
+  $$('#filtros .chip').forEach(el => el.addEventListener('click', () => { filtro = el.dataset.f; desenhar(); }));
+}
+
+function agrupado(lista, por) {
+  const chave = e => (por === 'colaborador' ? (e.responsavel || '') : e.maquina);
+  const g = new Map();
+  for (const e of lista) { if (!g.has(chave(e))) g.set(chave(e), []); g.get(chave(e)).push(e); }
+  return [...g.entries()]
+    .sort((a, b) => (a[0] ? 0 : 1) - (b[0] ? 0 : 1) || String(a[0]).localeCompare(String(b[0]), 'pt-BR'))
+    .map(([quem, itens]) => {
+      const grav = itens.reduce((s, e) => s + e.gravissimos, 0);
+      const ab = itens.reduce((s, e) => s + e.abertos, 0);
+      const pub = itens.reduce((m, e) => (!m || e.publicado_em > m ? e.publicado_em : m), '');
+      return `<div class="grupo"><div class="grupo-cab">
+        ${quem ? '<b>' + esc(quem) + '</b>' : '<b style="color:var(--dim2)">Sem responsável definido</b>'}
+        <span style="color:var(--dim)">· ${itens.length} empresa(s) · ${ab} em aberto</span>
+        ${grav ? '<span class="pill verm">' + grav + ' gravíssimo' + (grav > 1 ? 's' : '') + '</span>' : ''}
+        ${por === 'maquina' && pub ? '<span style="margin-left:auto;color:var(--dim2);font-size:12px">publicou ' + emDias(dias(pub)) + '</span>' : ''}
+      </div>${tabela(itens)}</div>`;
+    }).join('');
+}
+
+function tabela(lista) {
+  const n = (v, cls, sing, plur) => (v ? `<span class="pill ${cls}">${v} ${v > 1 ? plur : sing}</span>` : '');
+  return `<div class="rolagem"><table>
+    <thead><tr><th>Empresa</th><th>Responsável</th><th>Última competência</th>
+      <th>Em aberto</th><th>Prazo</th><th>Variação de valor</th><th>Publicado</th></tr></thead>
+    <tbody>${lista.map(e => {
+      const venc = e.proximo_vencimento ? dias(e.proximo_vencimento) : null;
+      return `<tr>
+      <td><b>${esc(e.nome || e.cnpj)}</b><div class="mini">${fmtCnpj(e.cnpj)}${e.uf ? ' · ' + esc(e.uf) : ''}</div></td>
+      <td>${e.responsavel ? esc(e.responsavel) : '<span style="color:var(--dim2)">—</span>'}</td>
+      <td>${e.ultima_competencia ? fmtMes(e.ultima_competencia) : '<span style="color:var(--dim2)">—</span>'}
+        <div class="mini">${e.meses} mês(es)</div></td>
+      <td>${!e.atualizada
+        ? '<span class="pill amar">a reanalisar</span><div class="mini">análise anterior ao alerta de variação</div>'
+        : (n(e.gravissimos, 'verm', 'gravíssimo', 'gravíssimos') + n(e.divergencias, 'verm', 'divergência', 'divergências')
+          + n(e.graves, 'amar', 'grave', 'graves') + n(e.conferir, 'amar', 'a conferir', 'a conferir')
+          || '<span class="pill verde">sem alerta</span>')}</td>
+      <td>${venc != null
+        ? `<span class="pill ${venc > 0 ? 'verm' : venc >= -3 ? 'amar' : 'cinza'}">Vcto ${fmtData(e.proximo_vencimento)} · `
+          + (venc > 0 ? 'venceu ' + emDias(venc) : venc === 0 ? 'vence hoje' : 'vence em ' + (-venc) + ' dia' + (venc === -1 ? '' : 's')) + '</span>'
+        : '<span style="color:var(--dim2)">—</span>'}
+        ${e.dias_aberto != null ? '<div class="mini">alerta aberto ' + emDias(e.dias_aberto) + '</div>' : ''}</td>
+      <td>${(e.variacao || []).length
+        ? (e.variacao || []).slice(0, 3).map(v => `<div class="mini"><b>${esc(v.tributo)}${v.escopo ? ' ' + esc(v.escopo) : ''}</b>
+            ${fmtMes(v.competencia)} · ${esc(v.nivel)} · R$ ${brl(v.valor)}</div>`).join('')
+          + ((e.variacao || []).length > 3 ? '<div class="mini">+' + ((e.variacao).length - 3) + ' outro(s)</div>' : '')
+        : '<span style="color:var(--dim2)">—</span>'}</td>
+      <td class="mini">${esc(e.maquina)}<br>${emDias(dias(e.publicado_em))}</td>
+    </tr>`; }).join('')}</tbody></table></div>`;
+}
+
+// ------------------------------------------------------------------ eventos
+$('#formLogin').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const b = $('#btnEntrar'); const erro = $('#erroLogin');
+  b.disabled = true; b.textContent = 'Entrando…'; erro.classList.add('oculto');
+  try {
+    await entrar($('#email').value.trim(), $('#senha').value);
+    $('#senha').value = '';
+    await abrir();
+  } catch (e) {
+    erro.textContent = /invalid/i.test(e.message) ? 'E-mail ou senha não conferem.' : e.message;
+    erro.classList.remove('oculto');
+  } finally { b.disabled = false; b.textContent = 'Entrar'; }
+});
+
+$('#btnSair').addEventListener('click', () => { esquecer(); location.reload(); });
+$('#btnAtualizar').addEventListener('click', async () => {
+  const b = $('#btnAtualizar'); b.disabled = true; b.textContent = 'Atualizando…';
+  try { await carregar(); desenhar(); } catch (e) { alert('Não atualizou: ' + e.message); }
+  finally { b.disabled = false; b.textContent = 'Atualizar'; }
+});
+$$('#visao .tab').forEach(el => el.addEventListener('click', () => {
+  visao = el.dataset.v;
+  $$('#visao .tab').forEach(x => x.classList.toggle('on', x === el));
+  desenhar();
+}));
+
+async function abrir() {
+  mostrarPainel();
+  try {
+    await carregar();
+    desenhar();
+  } catch (e) {
+    // sem o cartao do portal a consulta volta vazia ou negada: explica em vez de mostrar tela em branco
+    $('#avisos').innerHTML = '<div class="aviso">Não consegui carregar a carteira: ' + esc(e.message)
+      + '<br>Se você acabou de ganhar acesso, saia e entre de novo. Se o acesso ainda não foi liberado, '
+      + 'peça o cartão <b>Revisão Fiscal</b> no portal.</div>';
+  }
+}
+
+(async () => { if (await retomar()) abrir(); })();
+</script>
+</body>
+</html>
